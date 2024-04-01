@@ -48,11 +48,14 @@ def main():
         # add labels
         img_text = Image.new(mode = "RGBA", size = (200, 200), color = (0, 255, 0, 0))
         imgt = ImageDraw.Draw(img_text)
-        imgt.text((0, 0), text = str(i), font = font)
-        #img_text = img_text.rotate(90 + (360 - i), expand = 1)
+        imgt.text((50, 50), text = str(i), font = font, align = 'center')
+        tr = img_text.size
+        angle = (360 - ang) + (180 + 140) + 2
+        x = math.sin(math.radians(angle))
+        y = math.cos(math.radians(angle))
         position = (
-            int((res_w // 2) + (x * (res_w // 2.4))),
-            int((res_h // 2) + (y * (res_h // 2.4)))
+            int(((res_w // 2) + (x * (res_w // 2.4))) - (tr[0] / 2)),
+            int(((res_h // 2) + (y * (res_h // 2.4))) - (tr[1] / 2))
         )
         img.paste(img_text, position, img_text)
 
