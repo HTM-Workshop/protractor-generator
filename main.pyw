@@ -19,11 +19,14 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def generate_protractor(self):
         pot_degrees = self.spinbox_degrees.value()
+        dead_zone = (pot_degrees / 2) * ((self.spinbox_deadzone.value() / 2) / 100)
+        pot_degrees = ((pot_degrees / 2) - dead_zone) * 2
         resist_ratio = self.spinbox_resistance.value() / pot_degrees
-        dead_zone = pot_degrees * ((self.spinbox_deadzone.value() / 2) / 100)
-        graph_rot_offset = -1 * ((360 - pot_degrees) / 2)
+        graph_rot_offset = -1 * ((360 - self.spinbox_degrees.value()) / 2)
         temp_range = range(40, 24, -1)
         res_w, res_h = 5000, 5000
+
+        print(pot_degrees)
 
         img = Image.new(mode = "RGB", size = (res_w, res_h))
         img1 = ImageDraw.Draw(img)
