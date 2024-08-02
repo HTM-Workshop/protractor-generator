@@ -16,17 +16,20 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.button_generate.clicked.connect(self.generate_protractor)
         self.setWindowTitle("Protractor Generator")
+        self._usable_degrees = 0
 
     def generate_protractor(self):
         pot_degrees = self.spinbox_degrees.value()
         dead_zone = (pot_degrees / 2) * ((self.spinbox_deadzone.value() / 2) / 100)
-        pot_degrees = ((pot_degrees / 2) - dead_zone) * 2
-        resist_ratio = self.spinbox_resistance.value() / pot_degrees
+        self._usable_degrees = ((pot_degrees / 2) - dead_zone) * 2
+        resist_ratio = self.spinbox_resistance.value() / self._usable_degrees
         graph_rot_offset = -1 * ((360 - self.spinbox_degrees.value()) / 2)
         temp_range = range(40, 24, -1)
         res_w, res_h = 5000, 5000
 
-        print(pot_degrees)
+        print(F"Usable degrees: {self._usable_degrees}")
+        print(F"Deadzone per side: {dead_zone}")
+        print(F"Degrees in C per angular degree: {resist_ratio}")
 
         img = Image.new(mode = "RGB", size = (res_w, res_h))
         img1 = ImageDraw.Draw(img)
@@ -53,7 +56,7 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
 
         
         for i in temp_range:
-            ang = self.get_angle_from_celsius(i, resist_ratio) - dead_zone
+            ang = self.get_angle_from_celsius(i, resist_ratio, dead_zone)
             if(ang < 0):
                 continue
             angle = (360 - ang) + graph_rot_offset
@@ -87,10 +90,10 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
 
         img.show()
 
-    def get_angle_from_celsius(self, temp: int, resist_ratio: float) -> int:
-        resistance = (-0.0296 * (temp ** 3)) + (4.5449 * (temp ** 2)) + (-270.1504 * temp) + 6628.8089
+    def get_angle_from_celsius(self, temp: int, resist_ratio: float, dead_zone: int) -> int:
+        resistance = (-0.0296102246566647 * (temp ** 3)) + (4.54491006929092 * (temp ** 2)) + (-270.150380192564 * temp) + 6628.80893409997
         resistance = resistance - 1200         # remove minimum resistance expected at lowest setting for calibration
-        return(self.spinbox_degrees.value() - round(resistance / resist_ratio))
+        return((self._usable_degrees + dead_zone) - round(resistance / resist_ratio))
 
 
 
