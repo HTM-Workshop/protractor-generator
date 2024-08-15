@@ -19,39 +19,22 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
         self._usable_degrees = 0
 
     def generate_protractor(self):
-
-        # total mechanical degrees as per the datasheet
         pot_degrees = self.spinbox_degrees.value()
-
-        # calculate the deadzone degrees based on the datasheet's deadzone range
-        self.dead_zone = pot_degrees * (self.spinbox_deadzone.value() / 100)
-
-        # usable degrees (mechanical degrees minus deadzone)
-        #   This is the final range used for the rest of the program.
-        self.usable_degrees = pot_degrees - self.dead_zone
-
-        # change in resistance per angular degree (dR/dA)
-        self.r_per_degree = self.spinbox_resistance.value() / self.usable_degrees
-
-        # graph rotation amount
+        self.dead_zone = (pot_degrees / 2) * ((self.spinbox_deadzone.value() / 2) / 100)
+        self._usable_degrees = ((pot_degrees / 2) - self.dead_zone) * 2
+        resist_ratio = self.spinbox_resistance.value() / self._usable_degrees
         graph_rot_offset = -1 * ((360 - self.spinbox_degrees.value()) / 2)
-
-        # graph resolution
+        temp_range = range(40, 20, -1)
         res_w, res_h = 5000, 5000
 
-        # temp range to plot
-        temp_range = range(40, 1, -1)
+        print(F"Usable degrees: {self._usable_degrees}")
+        print(F"Deadzone per side: {self.dead_zone}")
+        print(F"Degrees in C per angular degree: {resist_ratio}")
+        print(F"Rot: {graph_rot_offset}")
 
-
-        # debug
-        print(f"Usable degrees: {self.usable_degrees}")
-        print(f"Deadzone: {self.dead_zone}")
-        print(f"Degrees in celsius per angular degree: {self.r_per_degree}")
-        print(f"Rot: {graph_rot_offset}")
-
-        # open new image and font
         img = Image.new(mode = "RGB", size = (res_w, res_h))
         img1 = ImageDraw.Draw(img)
+
         if sys.platform == 'linux':
             font = ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf", 90)
         elif sys.platform == 'darwin':
@@ -61,10 +44,8 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             font = ImageFont.load_default()
 
-        
-        # Draw the outer degree ring.
         for i in range(0, self.spinbox_degrees.value()):
-            angle = ((360 - i) + graph_rot_offset)
+            angle = (360 - i) + graph_rot_offset
             x = math.sin(math.radians(angle))
             y = math.cos(math.radians(angle))
             x_start = x * (res_w / 2.2)
@@ -75,12 +56,11 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
             img1.line(segment, width = 10)
 
         
-        # draw the major temperature divisions
         for i in temp_range:
-            ang = self.get_angle_from_celsius(i, self.r_per_degree, self.dead_zone)
+            ang = self.get_angle_from_celsius(i, resist_ratio, self.dead_zone)
             if(ang < 0):
-                break
-            angle = ((360 - ang) + graph_rot_offset) - self.dead_zone // 2
+                continue
+            angle = (360 - ang) + graph_rot_offset
             x = math.sin(math.radians(angle))
             y = math.cos(math.radians(angle))
             x_start = 0
@@ -90,12 +70,12 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
             segment = [((res_w / 2) + x_start, (res_h // 2) + y_start), ((res_w // 2) + x_end, (res_h // 2) + y_end)]
             img1.line(segment, width = 10)
 
-            # add labels to those divisions
+            # add labels
             img_text = Image.new(mode = "RGBA", size = (200, 200), color = (0, 255, 0, 0))
             imgt = ImageDraw.Draw(img_text)
             imgt.text((50, 50), text = str(i), font = font, align = 'center')
             tr = img_text.size
-            angle = angle + 2
+            angle = (360 - ang) + graph_rot_offset + 2
             x = math.sin(math.radians(angle))
             y = math.cos(math.radians(angle))
             position = (
@@ -104,17 +84,13 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
             )
             img.paste(img_text, position, img_text)
 
-
-        # render and display image
         img = img.resize((res_w // 4, res_h // 4), resample = Image.LANCZOS)
+
         if(not self.checkbox_invert.isChecked()):
             img = ImageOps.invert(img)
+
         img.show()
 
-    
-    # calculate the expected resistance value for a given temperature value
-    # then convert that into the approximate mechancial angle of the potentiometer that will give that resistance value
-    # this calculation is done on the deadzone-corrected angular range (self.usable_degrees).
     def get_angle_from_celsius(self, temp: int, resist_ratio: float, dead_zone: int) -> int:
         if self.ysi_400_button.isChecked():
             resistance = (-0.0296102246566647 * (temp ** 3)) + (4.54491006929092 * (temp ** 2)) + (-270.150380192564 * temp) + 6628.80893409997
@@ -122,13 +98,12 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             resistance = (-0.825010101010102 * (temp ** 3)) + (95.2720346320347 * (temp ** 2)) + (-4461.07128427129 * temp) + 94783.7878787879
             resistance = resistance - 16146         # remove minimum resistance expected at lowest setting for calibration
-        
-        base_angle = self.usable_degrees - round(resistance / resist_ratio)
-        print(f"R: {resistance}, T: {temp}")
-        print(f"BA: {base_angle}\n-----\n")
-        return(base_angle)
-    
-    
+        angle = (self._usable_degrees + dead_zone) - round(resistance / resist_ratio)
+
+        return(angle)
+
+
+
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     main_app = ProtractorGen()
