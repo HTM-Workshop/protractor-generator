@@ -20,8 +20,8 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 
-VERSION = "v1.0.0"
-DEBUG = False
+VERSION = "v1.0.1"
+DEBUG = True
 
 import sys
 import math
@@ -143,8 +143,8 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
             resistance = (-0.0296102246566647 * (temp ** 3)) + (4.54491006929092 * (temp ** 2)) + (-270.150380192564 * temp) + 6628.80893409997
             resistance = resistance - 1200         # remove minimum resistance expected at lowest setting for calibration
         else:
-            resistance = (-0.825010101010102 * (temp ** 3)) + (95.2720346320347 * (temp ** 2)) + (-4461.07128427129 * temp) + 94783.7878787879
-            resistance = resistance - 16146         # remove minimum resistance expected at lowest setting for calibration
+            resistance = (-0.0653833520400828 * (temp ** 3)) + (10.7416144720775 * (temp ** 2)) + (-675.00068236601 * temp) + 30365.4315467578
+            resistance = resistance - 16360         # remove minimum resistance expected at lowest setting for calibration
         
         base_angle = self.usable_degrees - round(resistance / resist_ratio)
         if DEBUG:
