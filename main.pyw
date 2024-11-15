@@ -20,8 +20,8 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 
-VERSION = "v1.1-alpha.1"
-DEBUG = False
+VERSION = "v1.1-alpha.2"
+DEBUG = True
 
 import sys
 import math
@@ -54,18 +54,29 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
         self.usable_degrees = pot_degrees - self.dead_zone
 
         # calculate ohm ranges with dividing resistors
-        top_ysi400 = (1 / ((1 / self.spinbox_resistance.value()) + (1 / 1500)))
-        top_ysi700 = (1 / ((1 / self.spinbox_resistance.value()) + (1 / 10000)))
+        #range_ysi400 = (1 / ((1 / self.spinbox_resistance.value()) + (1 / 1500)))
+        #range_ysi700 = (1 / ((1 / self.spinbox_resistance.value()) + (1 / 10000)))
+        range_ysi400 = self.spinbox_resistance.value()
+        range_ysi700 = self.spinbox_resistance.value()
 
         # calculate change in resistance per angular degree (dR/dA)
-        self.rd_ysi400 = top_ysi400 / self.usable_degrees
-        self.rd_ysi700 = top_ysi700 / self.usable_degrees
+        self.rd_ysi400 = range_ysi400 / self.usable_degrees
+        self.rd_ysi700 = range_ysi700 / self.usable_degrees
 
          # graph rotation amount
         self.graph_rot_offset = -1 * ((360 - self.spinbox_degrees.value()) / 2)
 
         # graph resolution
         self.res_w, self.res_h = 5000, 5000
+
+
+        if DEBUG:
+            print(f"Usable degrees: {self.usable_degrees}")
+            print(f"range_ysi400: {range_ysi400}")
+            print(f"range_ysi700: {range_ysi700}")
+            print(f"rd_ysi400: {self.rd_ysi400}")
+            print(f"rd_ysi700: {self.rd_ysi700}")
+
 
         # open new image and font
         self.img = Image.new(mode = "RGB", size = (self.res_w, self.res_h))
@@ -94,8 +105,8 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
   
         # draw temperature divisions
         if self.ysi_both.isChecked():
-            self.draw_temp_divisions(self.rd_ysi400, True, False)
-            self.draw_temp_divisions(self.rd_ysi700, False, False)
+            self.draw_temp_divisions(self.rd_ysi400, False, False)
+            self.draw_temp_divisions(self.rd_ysi700, True, False)
             label_str = f"Inner: YSI-700\nOuter: YSI-400\nR = {self.spinbox_resistance.value()}"
         elif self.ysi_400_button.isChecked():
             self.draw_temp_divisions(self.rd_ysi400, True, True)
@@ -112,7 +123,7 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
             font = self.font, 
             align = 'center'
         )
-        position = [1500, 4000]
+        position = [100, 100]
         self.img.paste(img_text, position, img_text)
 
         # draw guidelines
@@ -139,7 +150,7 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
             level = (0.4 * ysi_400) + 1
 
         for i in temp_range:
-            ang = self.get_angle_from_celsius(i, rd_ratio, self.dead_zone, ysi_400)
+            ang = self.get_angle_from_celsius(i, rd_ratio, self.dead_zone, not ysi_400)
             if(ang < 0):
                 break
             angle = 360 - (((360 - ang) + self.graph_rot_offset) - self.dead_zone // 2)
@@ -177,15 +188,25 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
     def get_angle_from_celsius(self, temp: int, resist_ratio: float, dead_zone: int, ysi_400: bool) -> int:
         if ysi_400:
             resistance = (-0.0296102246566647 * (temp ** 3)) + (4.54491006929092 * (temp ** 2)) + (-270.150380192564 * temp) + 6628.80893409997
-            resistance = resistance - 1200         # remove minimum resistance expected at lowest setting for calibration
+            #resistance = resistance - 1200         # remove minimum resistance expected at lowest setting for calibration
         else:
             resistance = (-0.0758117011986962 * (temp ** 3)) + (11.816010614772 * (temp ** 2)) + (-710.457138320909 * temp) + 17560.6514816452
-            resistance = resistance - 3196         # remove minimum resistance expected at lowest setting for calibration
+            #resistance = resistance - 3196         # remove minimum resistance expected at lowest setting for calibration
         
-        base_angle = self.usable_degrees - round(resistance / resist_ratio)
+
+        # resistance now contains the goal resistance. Now we need to determine what resistance the main poteniometer
+        # needs to be at to return that resistance value. p_res is the resistance value that the main pot in isolation
+        # needs to be at for the dividing circuit to return the correct value (resistance)
+        resistance = resistance + 0.01
+        if ysi_400:
+            p_res = (-1500 * (resistance - 1200)) / (resistance - 2700)
+        else:
+            p_res = (-10000 * (resistance - 3196)) / (resistance - 13196)
+        base_angle = self.usable_degrees - round(p_res / resist_ratio)
         if DEBUG:
             print(f"RR: {resist_ratio}")
             print(f"R: {resistance}, T: {temp}")
+            print(f"P_RES: {p_res}")
             print(f"BA: {base_angle}\n-----\n")
         return(base_angle)
     
