@@ -194,10 +194,10 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
             #resistance = resistance - 3196         # remove minimum resistance expected at lowest setting for calibration
         
 
-        # resistance now contains the goal resistance. Now we need to determine what resistance the main poteniometer
+        # resistance now contains the output goal resistance. Now we need to determine what resistance the main poteniometer
         # needs to be at to return that resistance value. p_res is the resistance value that the main pot in isolation
-        # needs to be at for the dividing circuit to return the correct value (resistance)
-        resistance = resistance + 0.01
+        # needs to be at for the dividing circuit to output the correct value.
+        resistance = resistance + 0.01              # to prevent possible division by zero errors
         if ysi_400:
             p_res = (-1500 * (resistance - 1200)) / (resistance - 2700)
         else:
