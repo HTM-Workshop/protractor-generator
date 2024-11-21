@@ -20,8 +20,8 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 
-VERSION = "v1.1-alpha.2"
-DEBUG = True
+VERSION = "v1.1-alpha.3"
+DEBUG = False
 
 import sys
 import math
@@ -38,8 +38,20 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
         super(ProtractorGen, self).__init__(*args, **kwargs)
         self.setupUi(self)
         self.button_generate.clicked.connect(self.generate_protractor)
+        self.radio_resist_no.clicked.connect(self.update_controls)
+        self.radio_resist_yes.clicked.connect(self.update_controls)
         self.setWindowTitle(f"Protractor Generator - {VERSION}")
         self._usable_degrees = 0
+    
+    def update_controls(self):
+        if self.main_control_frame.isEnabled() == False:
+            self.main_control_frame.setEnabled(True)
+        if self.radio_resist_yes.isChecked():
+            self.standard_select_frame.setEnabled(False)
+        else:
+            self.standard_select_frame.setEnabled(True)
+            self.ysi_400_button.setEnabled(True)
+            self.ysi_700_button.setEnabled(True)
 
     def generate_protractor(self):
 
@@ -104,15 +116,15 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
 
   
         # draw temperature divisions
-        if self.ysi_both.isChecked():
+        if self.radio_resist_yes.isChecked():
             self.draw_temp_divisions(self.rd_ysi400, False, False)
             self.draw_temp_divisions(self.rd_ysi700, True, False)
             label_str = f"Inner: YSI-700\nOuter: YSI-400\nR = {self.spinbox_resistance.value()}"
         elif self.ysi_400_button.isChecked():
-            self.draw_temp_divisions(self.rd_ysi400, True, True)
+            self.draw_temp_divisions(self.rd_ysi400, False, True)
             label_str = f"YSI-400\nR = {self.spinbox_resistance.value()}"
         elif self.ysi_700_button.isChecked():
-            self.draw_temp_divisions(self.rd_ysi700, False, True)
+            self.draw_temp_divisions(self.rd_ysi700, True, True)
             label_str = f"YSI-700\nR = {self.spinbox_resistance.value()}"
         label_str = label_str + f"\n{self.line_custom_label.text()}"
         img_text = Image.new(mode = "RGBA", size = (800, 400), color = (0, 255, 0, 0))
@@ -198,10 +210,16 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
         # needs to be at to return that resistance value. p_res is the resistance value that the main pot in isolation
         # needs to be at for the dividing circuit to output the correct value.
         resistance = resistance + 0.01              # to prevent possible division by zero errors
-        if ysi_400:
-            p_res = (-1500 * (resistance - 1200)) / (resistance - 2700)
+        if self.radio_resist_yes.isChecked():
+            if ysi_400:
+                p_res = (-1500 * (resistance - 1200)) / (resistance - 2700)
+            else:
+                p_res = (-10000 * (resistance - 3196)) / (resistance - 13196)
         else:
-            p_res = (-10000 * (resistance - 3196)) / (resistance - 13196)
+            if ysi_400:
+                p_res = resistance - 1200
+            else:
+                p_res = resistance - 3196
         base_angle = self.usable_degrees - round(p_res / resist_ratio)
         if DEBUG:
             print(f"RR: {resist_ratio}")
