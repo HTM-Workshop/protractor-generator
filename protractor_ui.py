@@ -14,8 +14,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(857, 606)
-        MainWindow.setMinimumSize(QtCore.QSize(857, 606))
+        MainWindow.resize(857, 641)
+        MainWindow.setMinimumSize(QtCore.QSize(857, 641))
         MainWindow.setMaximumSize(QtCore.QSize(999999, 999999))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -133,6 +133,25 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.horizontalFrame, 2, 0, 1, 1)
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
+        self.menuBar = QtWidgets.QMenuBar(MainWindow)
+        self.menuBar.setGeometry(QtCore.QRect(0, 0, 857, 38))
+        self.menuBar.setObjectName("menuBar")
+        self.menuFile = QtWidgets.QMenu(self.menuBar)
+        self.menuFile.setObjectName("menuFile")
+        self.menuHelp = QtWidgets.QMenu(self.menuBar)
+        self.menuHelp.setObjectName("menuHelp")
+        MainWindow.setMenuBar(self.menuBar)
+        self.action_quit = QtWidgets.QAction(MainWindow)
+        self.action_quit.setObjectName("action_quit")
+        self.action_about = QtWidgets.QAction(MainWindow)
+        self.action_about.setObjectName("action_about")
+        self.action_license = QtWidgets.QAction(MainWindow)
+        self.action_license.setObjectName("action_license")
+        self.menuFile.addAction(self.action_quit)
+        self.menuHelp.addAction(self.action_about)
+        self.menuHelp.addAction(self.action_license)
+        self.menuBar.addAction(self.menuFile.menuAction())
+        self.menuBar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -148,15 +167,15 @@ class Ui_MainWindow(object):
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Ubuntu\'; font-size:10pt;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Ubuntu\'; font-size:10pt; font-weight:600;\">1. </span><span style=\" font-family:\'Ubuntu\'; font-size:10pt;\">Turn center potentiometer fully counter-clockwise</span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Ubuntu\'; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Ubuntu\'; font-size:10pt; font-weight:600;\">2.</span><span style=\" font-family:\'Ubuntu\'; font-size:10pt;\"> Measure resistance between TP3 and TP4. This is your Resistance of Potentiometer. Save this reading for later.</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Ubuntu\'; font-size:10pt; font-weight:600;\">2.</span><span style=\" font-family:\'Ubuntu\'; font-size:10pt;\"> Measure resistance between TP3 and TP4. Enter this value into the \'Resistance for Potentiometer\' box on the left.</span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Ubuntu\'; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Ubuntu\'; font-size:10pt; font-weight:600;\">3.</span><span style=\" font-family:\'Ubuntu\'; font-size:10pt;\"> Switch mode switch to 400.</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Ubuntu\'; font-size:10pt; font-weight:600;\">3.</span><span style=\" font-family:\'Ubuntu\'; font-size:10pt;\"> Switch mode switch to YSI 400.</span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Ubuntu\'; font-size:10pt;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Ubuntu\'; font-size:10pt; font-weight:600;\">4.</span><span style=\" font-family:\'Ubuntu\'; font-size:10pt;\"> Place multimeter probes in the Meter Probes slots and set to measure resistance.</span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Ubuntu\'; font-size:10pt;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Ubuntu\'; font-size:10pt; font-weight:600;\">5.</span><span style=\" font-family:\'Ubuntu\'; font-size:10pt;\"> Turn 2K potentiometer (RV3) until meter reads as close as possbile to 1200 ohms.</span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Ubuntu\'; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Ubuntu\'; font-size:10pt; font-weight:600;\">6.</span><span style=\" font-family:\'Ubuntu\'; font-size:10pt;\"> Switch mode switch to 700.</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Ubuntu\'; font-size:10pt; font-weight:600;\">6.</span><span style=\" font-family:\'Ubuntu\'; font-size:10pt;\"> Switch mode switch to YSI 700.</span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Ubuntu\'; font-size:10pt;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Ubuntu\'; font-size:10pt; font-weight:600;\">7.</span><span style=\" font-family:\'Ubuntu\'; font-size:10pt;\"> Turn 5K potentiometer (RV1) until meter reads as close as possible to 3196 ohms.</span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Ubuntu\'; font-size:10pt;\"><br /></p>\n"
@@ -166,14 +185,14 @@ class Ui_MainWindow(object):
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Ubuntu\'; font-size:10pt;\"><br /></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Ubuntu\'; font-size:10pt;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Ubuntu\'; font-size:10pt;\"><br /></span><span style=\" font-family:\'Ubuntu\'; font-size:10pt; font-weight:600;\">WARNING</span><span style=\" font-family:\'Ubuntu\'; font-size:10pt;\">: This device and program are for educational purposes only. Do not calibrate active medical equipment using this device.</span></p></body></html>"))
-        self.label_6.setText(_translate("MainWindow", "Standard"))
+        self.label_6.setText(_translate("MainWindow", "Type:"))
         self.ysi_400_button.setText(_translate("MainWindow", "YSI-400"))
         self.ysi_700_button.setText(_translate("MainWindow", "YSI-700"))
-        self.label_2.setText(_translate("MainWindow", "Resistance of Potentiometer (Between outer pins)"))
-        self.label.setText(_translate("MainWindow", "Maximum Potentiometer Degrees (mechanical)"))
-        self.label_4.setText(_translate("MainWindow", "Potentiometer \'dead-zone\' (Leave default if not sure)"))
+        self.label_2.setText(_translate("MainWindow", "Resistance of Potentiometer (Between outer pins):"))
+        self.label.setText(_translate("MainWindow", "Maximum Potentiometer Degrees (mechanical):"))
+        self.label_4.setText(_translate("MainWindow", "Potentiometer \'dead-zone\' (Leave default if not sure):"))
         self.label_5.setText(_translate("MainWindow", "%"))
-        self.label_8.setText(_translate("MainWindow", "Custom Label (optional)"))
+        self.label_8.setText(_translate("MainWindow", "Custom Label (optional):"))
         self.line_custom_label.setPlaceholderText(_translate("MainWindow", "Your name, device identifier, etc."))
         self.checkbox_invert.setText(_translate("MainWindow", "Invert Colors"))
         self.button_generate.setText(_translate("MainWindow", "Generate Protractor Image"))
@@ -183,3 +202,18 @@ class Ui_MainWindow(object):
         self.label_17.setText(_translate("MainWindow", "Have you soldered on resistors R2 and R3?"))
         self.radio_resist_yes.setText(_translate("MainWindow", "Yes"))
         self.radio_resist_no.setText(_translate("MainWindow", "No"))
+        self.menuFile.setTitle(_translate("MainWindow", "File"))
+        self.menuHelp.setTitle(_translate("MainWindow", "Help"))
+        self.action_quit.setText(_translate("MainWindow", "Quit"))
+        self.action_about.setText(_translate("MainWindow", "About"))
+        self.action_license.setText(_translate("MainWindow", "License"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())

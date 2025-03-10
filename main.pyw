@@ -6,7 +6,7 @@
 #   Written by Kevin Williams - 2024
 #
 #  This program is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
+#  it under the terms of the GNU General Public License as published byp
 #  the Free Software Foundation; either version 2 of the License, or
 #  (at your option) any later version.
 #
@@ -20,29 +20,58 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 
-VERSION = "v1.1-alpha.3"
+VERSION = "v1.2"
 DEBUG = False
 
 import sys
 import math
+import images_qr
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 from webbrowser import Error as wb_error
 from webbrowser import open as wb_open
 from PyQt5 import QtWidgets, QtCore, QtGui
-
 from protractor_ui import Ui_MainWindow
+from about_ui import Ui_Dialog
+from license import Ui_license_window
+
+class AboutDialog(QtWidgets.QDialog, Ui_Dialog):
+    def __init__(self, *args, **kwargs):
+        super(AboutDialog, self).__init__(*args, **kwargs)
+        self.setupUi(self)
+        self.version.setText(f"Version: {VERSION}")
+
+
+class LicenseDialog(QtWidgets.QDialog, Ui_license_window):
+    def __init__(self, *args, **kwargs):
+        super(LicenseDialog, self).__init__(*args, **kwargs)
+        self.setupUi(self)
+
 
 class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, *args, **kwargs):
         super(ProtractorGen, self).__init__(*args, **kwargs)
         self.setupUi(self)
+        self.setWindowIcon(QtGui.QIcon(':/icon/icon.png'))
+        self.about_window = AboutDialog()
+        self.license_window = LicenseDialog()
         self.update_instruction_window()
         self.button_generate.clicked.connect(self.generate_protractor)
         self.radio_resist_no.clicked.connect(self.update_controls)
         self.radio_resist_yes.clicked.connect(self.update_controls)
-        self.setWindowTitle(f"Protractor Generator - {VERSION}")
+        self.ysi_400_button.clicked.connect(self.update_controls)
+        self.ysi_700_button.clicked.connect(self.update_controls)
+        self.action_about.triggered.connect(self.show_about)
+        self.action_license.triggered.connect(self.show_license)
+        self.action_quit.triggered.connect(sys.exit)
+        self.setWindowTitle("Temperature Simulator - Label")
         self._usable_degrees = 0
+
+    def show_license(self):
+        self.license_window.show()
+
+    def show_about(self):
+        self.about_window.show()
     
     def update_controls(self):
         if self.main_control_frame.isEnabled() == False:
@@ -54,6 +83,10 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
             self.ysi_400_button.setEnabled(True)
             self.ysi_700_button.setEnabled(True)
         self.update_instruction_window()
+        if self.ysi_400_button.isChecked():
+            self.spinbox_degrees.setValue(280)
+        else:
+            self.spinbox_degrees.setValue(300)
 
     def generate_protractor(self):
 
@@ -235,7 +268,7 @@ class ProtractorGen(QtWidgets.QMainWindow, Ui_MainWindow):
             self.textBrowser.setText("""<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
 <html><head><meta name="qrichtext" content="1" /><style type="text/css">
 p, li { white-space: pre-wrap; }
-</style></head><body style=" font-family:'Ubuntu'; font-size:10pt; font-weight:400; font-style:normal;">
+</style></head><body style=" font-family:'Ubuntu'; font-size:13pt; font-weight:400; font-style:normal;">
 <p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:12pt; font-weight:600;">Steps to Calibrate:</span></p>
 <p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
 <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-weight:600;">1. </span>Turn center potentiometer fully counter-clockwise</p>
@@ -262,44 +295,54 @@ p, li { white-space: pre-wrap; }
             self.textBrowser.setText("""<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
 <html><head><meta name="qrichtext" content="1" /><style type="text/css">
 p, li { white-space: pre-wrap; }
-</style></head><body style=" font-family:'Ubuntu'; font-size:10pt; font-weight:400; font-style:normal;">
-<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:12pt; font-weight:600;">Steps to Calibrate:</span></p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-weight:600;">1. </span>Turn center potentiometer fully counter-clockwise</p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-weight:600;">2.</span> Measure resistance between TP3 and TP4. This is your Resistance of Potentiometer. Save this reading for later.</p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-weight:600;">3.</span> Place multimeter probes in the Meter Probes slots and set to measure resistance.</p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-weight:600;">For YSI 400:</span></p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-weight:600;">1.</span> Switch mode switch to 400.</p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-weight:600;">2.</span> Turn 2K potentiometer (RV3) until meter reads as close as possbile to 1200 ohms.</p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-weight:600;">3.</span> Remove meter probes. The device is now calibrated.</p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-weight:600;">4.</span> Follow the steps to the left to generate a protractor unique to your device.</p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-weight:600;">For YSI 700:</span></p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-weight:600;">1.</span> Switch mode switch to 700.</p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-weight:600;">2.</span> Turn 5K potentiometer (RV1) until meter reads as close as possible to 3196 ohms.</p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-weight:600;">3.</span> Remove meter probes. The device is now calibrated.</p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-weight:600;">4.</span> Follow the steps to the left to generate a protractor unique to your device.</p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /><span style=" font-weight:600;">WARNING</span>: This device and program are for educational purposes only. Do not calibrate active medical equipment using this device.</p></body></html>""")
+</style></head><body style=" font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;">
+<p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Ubuntu'; font-size:12pt; font-weight:600;">Steps to Calibrate:</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt;"><br /></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Ubuntu'; font-size:12pt; font-weight:600;">For YSI 400:</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt; font-weight:600;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Ubuntu'; font-size:12pt; font-weight:600;">1. </span><span style=" font-family:'Ubuntu'; font-size:12pt;">Turn center potentiometer fully counter-clockwise</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Ubuntu'; font-size:12pt; font-weight:600;">2.</span><span style=" font-family:'Ubuntu'; font-size:12pt;"> Measure resistance between TP3 and TP4. Enter this value into the 'Resistance of Potentiometer' field on the left.</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Ubuntu'; font-size:12pt; font-weight:600;">3.</span><span style=" font-family:'Ubuntu'; font-size:12pt;"> Place multimeter probes in the Meter Probes slots and set to measure resistance.</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Ubuntu'; font-size:12pt; font-weight:600;">4.</span><span style=" font-family:'Ubuntu'; font-size:12pt;"> Switch mode switch to YSI 400.</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Ubuntu'; font-size:12pt; font-weight:600;">5.</span><span style=" font-family:'Ubuntu'; font-size:12pt;"> Turn 2K potentiometer (RV3) until meter reads as close as possbile to 1200 ohms.</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Ubuntu'; font-size:12pt; font-weight:600;">6.</span><span style=" font-family:'Ubuntu'; font-size:12pt;"> Remove meter probes. The device is now calibrated.</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Ubuntu'; font-size:12pt; font-weight:600;">7.</span><span style=" font-family:'Ubuntu'; font-size:12pt;"> Follow the steps to the left to generate a protractor unique to your device.</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Ubuntu'; font-size:12pt; font-style:italic;">Note: For YSI 400, the default mechanical range is 280 degrees.</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt;"><br /></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Ubuntu'; font-size:12pt; font-weight:600;">For YSI 700:</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt; font-weight:600;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Ubuntu'; font-size:12pt; font-weight:600;">1. </span><span style=" font-family:'Ubuntu'; font-size:12pt;">Turn center potentiometer fully counter-clockwise</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Ubuntu'; font-size:12pt; font-weight:600;">2.</span><span style=" font-family:'Ubuntu'; font-size:12pt;"> Measure resistance between TP3 and TP4. Enter this value into the 'Resistance of Potentiometer' field on the left.</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Ubuntu'; font-size:12pt; font-weight:600;">3.</span><span style=" font-family:'Ubuntu'; font-size:12pt;"> Place multimeter probes in the Meter Probes slots and set to measure resistance.</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Ubuntu'; font-size:12pt; font-weight:600;">4.</span><span style=" font-family:'Ubuntu'; font-size:12pt;"> Switch mode switch to YSI 700.</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Ubuntu'; font-size:12pt; font-weight:600;">5.</span><span style=" font-family:'Ubuntu'; font-size:12pt;"> Turn 5K potentiometer (RV1) until meter reads as close as possible to 3196 ohms.</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Ubuntu'; font-size:12pt; font-weight:600;">6.</span><span style=" font-family:'Ubuntu'; font-size:12pt;"> Remove meter probes. The device is now calibrated.</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Ubuntu'; font-size:12pt; font-weight:600;">7.</span><span style=" font-family:'Ubuntu'; font-size:12pt;"> Follow the steps to the left to generate a protractor unique to your device.</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Ubuntu'; font-size:12pt; font-style:italic;">Note: For YSI 700, the default mechanical range is 300 degrees.</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt;"><br /></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:12pt;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-family:'Ubuntu'; font-size:12pt;"><br /></span><span style=" font-family:'Ubuntu'; font-size:12pt; font-weight:600;">WARNING</span><span style=" font-family:'Ubuntu'; font-size:12pt;">: This device and program are for educational purposes only. Do not calibrate active medical equipment using this device.</span></p></body></html>""")
         else:
             self.textBrowser.setText("""<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
 <html><head><meta name="qrichtext" content="1" /><style type="text/css">
 p, li { white-space: pre-wrap; }
-</style></head><body style=" font-family:'Ubuntu'; font-size:10pt; font-weight:400; font-style:normal;">
+</style></head><body style=" font-family:'Ubuntu'; font-size:13pt; font-weight:400; font-style:normal;">
 <p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:12pt; font-weight:600;">Steps to Calibrate:</span></p>
 <p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p>
 <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-weight:600;">1. </span>First, select an option for the first question on the left.</p>
